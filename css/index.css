@@ -1,0 +1,19 @@
+body.preloader-site {
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.fill {
+    height: 100%;
+}
+
+.rounded-20 {
+    border-radius: 20px;
+}
+
+.rounded-15 {
+    border-radius: 15px;
+}

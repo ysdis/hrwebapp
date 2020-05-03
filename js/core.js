@@ -2,6 +2,7 @@ const numbersR = /^[0-9]*$/gm;
 const lettersR = /^[a-zA-Z0-9 ]*$/gm;
 const lettersWithRussianR = /^[a-zA-Z0-9ЁёА-я ]*$/gm;
 const textareaLettersR = /[^A-Za-z0-9ЁёА-я .'?!,@$#-_\n\r]*$/gm;
+const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 //-------------TABLE GENERATOR------------//
 
@@ -25,29 +26,53 @@ function createTable(headers = [],data, container = null, placeholder = '-') {
 
 //----------------PRELOADER---------------//
 
+function hidePreloader() {
+    $('#preloader').animate({'opacity': 0}, 200, function () {
+        $('#preloader').hide();
+        $('body').removeClass("preloader-site");
+    });
+}
+
+function showPreloader(callback = null) {
+    let preloader = $('#preloader');
+    preloader.show();
+    preloader.animate({'opacity': 1}, 200, function () {
+        $('body').addClass("preloader-site");
+        callback();
+    });
+}
+
 (function() {
     'use strict';
     window.addEventListener('load', function() {
-        $('#preloader').animate({'opacity': 0}, 200, function () {
-            $('#preloader').hide();
-            $('body').removeClass("preloader-site");
-        });
+        hidePreloader();
     }, false);
 })();
 
 //------------------ALERT-----------------//
 
-function showAlert(text, type = "danger", durationMills = 0) {
-    if(!$('#alertContainer').length) {
-        $('body').append('<div id="alertContainer" class="footer"></div>');
+function showAlert(text, type = "danger", durationMills = 0, container = null, isAlone = false) {
+    let isCustomContainer = true;
+    if(container === null) {
+        isCustomContainer = false
+        container = $('#alertContainer');
+        if(!container.length) {
+            $('body').append('<div id="alertContainer" class="footer"></div>');
+            container = $('#alertContainer');
+        }
     }
-    $('#alertContainer').append('<div class="alert alert-' + type + ' alert-dismissible fade show mx-3 mb-3" role="alert">' +
-                                    text +
-                                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                                        '<span aria-hidden="true">&times;</span>' +
-                                    '</button>' +
-                                '</div>');
-    let alertLink = $('#alertContainer .alert:last').alert();
+
+    if(isAlone) {
+        container.empty();
+    }
+
+    container.append('<div class="alert alert-' + type + ' alert-dismissible fade show ' + ((isCustomContainer) ? "" : 'mx-3 mb-3 ') + 'rounded-10" role="alert">' +
+        text +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span>' +
+        '</button>' +
+        '</div>');
+    let alertLink = container.find('.alert:last').alert();
     if(durationMills === 0) {
         return alertLink;
     } else {
@@ -63,7 +88,7 @@ function ajax(url,
               method,
               data = {},
               callbackSuccess = null,
-              callbackError = function (data) {showAlert(data.responseJSON, 'danger', 3000);}) {
+              callbackError = function (data) {console.log(data); showAlert(data.responseJSON, 'danger', 3000);}) {
     $.ajax({
         url: url,
         method: method,
@@ -147,47 +172,44 @@ const ITEMPL = 3;
 const ADMIN = 4;
 const HR = 5;
 
+let currentUserLogin;
+
 class User {
     constructor(login, callbackSuccess, callbackFail) {
-        this._login = login;
-        this._roleId = 0;
-        this._fullName = "";
         this._callbackSuccess = callbackSuccess;
         this._callbackFail = callbackFail;
-        this.setRole();
+        if(login === undefined) return;
+
+        this._login = login;
+        this._roleId = 0;
+        this._firstName = "";
+        this._lastName = "";
+        this._middleName = "-";
+        this._isActive = true;
+        this._specialtyId = 0;
+        this._password = "";
+
+        this.download();
     }
 
-    setFullName() {
-        var self = this;
+    download() {
+        let self = this;
         $.ajax({
-            url: './user.php',
+            url: './users.php',
             method: 'get',
-            contentType: 'application/json',
+            contentType: 'html',
             data: {
                 login: this._login
             },
             success: function(data) {
-                self._fullName = data.name;
-                self._callbackSuccess();
-            },
-            error: function(data) {
-                self._callbackFail(data);
-            }
-        });
-    }
+                self._lastName = data.lastName;
+                self._firstName = data.firstName;
+                self._middleName = data.middleName;
+                self._roleId = parseInt(data.roleId);
+                self._isActive = (parseInt(data.isActive) === 1);
+                self._specialtyId = parseInt(data.specialtyId);
 
-    setRole() {
-        var self = this;
-        $.ajax({
-            url: './ajax.php',
-            method: 'post',
-            dataType: 'html',
-            data: {
-                act: "getRoleId"
-            },
-            success: function(data) {
-                self._roleId = parseInt(data);
-                self.setFullName();
+                self._callbackSuccess();
             },
             error: function(data) {
                 self._callbackFail(data);

@@ -1,16 +1,11 @@
 <?php
-
-    require_once "base.php";
-
-    define("APPLICANT", '1');
-    define("EMPLOYEE", '2');
-    define("ADMIN", '3');
+    require_once "core.php";
 
     class Database {
         private $servername = "localhost";
         private $username = "root"; // id11586009_toor
         private $password = ""; // XYwU1oDj7\HFR#oF
-        private $dbname = "id11586009_stoneadmin";
+        private $dbname = "hrwebapp";
         
         public $conn = null;
 
@@ -33,33 +28,9 @@
         }
     }
 
-    function auth($login, $pass) {
-        try {
-            if($stmt = (new Database)->conn->prepare("SELECT COUNT(*) AS `res` FROM employees WHERE login = :login and pass = :pass;")) {
-                
-                if($stmt->execute(array(":login" => $login, ":pass" => $pass))) {
-                    $result = $stmt->fetch();
-                    if($result["res"] == 1) {
-                        $_SESSION["loggedin"] = true;
-                        $_SESSION["login"] = $login;
-                        return 0;
-                    } else {
-                        return 1; // Wrong credentials
-                    }
-                } else {
-                    return 2; // Something happend wrong
-                }
-            } else {
-                return 2; // !Error!
-            }
-        } catch(Exception $exception) {
-            die("Error: " . $exception->getMessage());
-        }
-    }
-
     function getRole($_login) {
         try {
-            if($stmt = (new Database)->conn->prepare("SELECT roleId FROM employees WHERE login = :login;")) {
+            if($stmt = (new Database)->conn->prepare("SELECT roleId FROM users WHERE login = :login;")) {
                 if($stmt->execute(array(":login" => $_login))) {
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                         return $result['roleId'];

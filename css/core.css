@@ -1,3 +1,7 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
 .dropdown-menu {
     width: 300px;
     margin-top: 10px;
@@ -40,7 +44,7 @@
     width: 100vw;
     height: 100vh;
     background: #FFF;
-    z-index: 1000;
+    z-index: 1000000;
 }
 
 .footer {
@@ -81,6 +85,18 @@
     opacity: 1;
 }
 
-body {
-    /*overflow: hidden;*/
+.fill {
+    height: 100%;
+}
+
+.rounded-20 {
+    border-radius: 20px;
+}
+
+.rounded-15 {
+    border-radius: 15px;
+}
+
+.rounded-10 {
+    border-radius: 10px;
 }

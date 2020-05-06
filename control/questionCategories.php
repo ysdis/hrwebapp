@@ -1,7 +1,8 @@
 <?php
-require_once 'core.php';
-require_once 'database.php';
-require_once './objects/QuestionCategory.php';
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once __ROOT__.'/core.php';
+require_once __ROOT__.'/Database.php';
+require_once __ROOT__.'/objects/QuestionCategory.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -33,7 +34,7 @@ if(empty($data) && $_SERVER["REQUEST_METHOD"] !== "GET") {
             break;
         case "POST":
             $item = new QuestionCategory();
-            $item->title = $data->title;
+            $item->title = htmlspecialchars(strip_tags($data->title));
 
             if($item->create()) {
                 throwSuccess("Категория успешно создана!", 201);
@@ -43,7 +44,7 @@ if(empty($data) && $_SERVER["REQUEST_METHOD"] !== "GET") {
             break;
         case "PUT":
             $item = new QuestionCategory($data->id);
-            $item->title = $data->title;
+            $item->title = htmlspecialchars(strip_tags($data->title));
 
             if($item->update()) {
                 throwSuccess("Категория успешно обновлена!", 201);

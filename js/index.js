@@ -8,7 +8,7 @@ let user = new User(
 
         $('#logoutBtn').show();
         $('#logoutBtn').on('click', function () {
-            showPreloader(function () {
+            showPreloader(null, function () {
                 window.location.href = "./logout.php";
             });
         });
@@ -42,7 +42,7 @@ function login() {
 function register() {
     showPreloader();
     ajax(
-        "./users.php",
+        "./control/users.php",
         "POST",
         JSON.stringify({
             'login': $('#regLogin').val(),

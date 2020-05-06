@@ -1,7 +1,7 @@
 <?php
 require_once 'core.php';
-require_once 'database.php';
-require_once './objects/user.php';
+require_once 'Database.php';
+require_once './objects/User.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 

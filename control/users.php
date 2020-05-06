@@ -1,7 +1,8 @@
 <?php
-require_once 'core.php';
-require_once 'database.php';
-require_once './objects/user.php';
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once __ROOT__.'/core.php';
+require_once __ROOT__.'/Database.php';
+require_once __ROOT__.'/objects/User.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 

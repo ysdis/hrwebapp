@@ -1,6 +1,6 @@
 <?php
 
-class application {
+class Application {
     private $id;
     private $applicantLogin;
     private $formId;
@@ -11,7 +11,8 @@ class application {
 
     public function __construct($_id = null) {
         if(!empty($_id)) {
-            $this->download($_id);
+            $this->id = htmlspecialchars(strip_tags($_id));
+            $this->download();
         }
     }
 
@@ -26,8 +27,8 @@ class application {
         }
     }
 
-    public function download($_id) {
-        $result = getRows("SELECT * FROM applications WHERE id = :id;", array(":id" => $_id));
+    public function download() {
+        $result = getRows("SELECT * FROM applications WHERE id = :id;", array(":id" => $this->id));
 
         if(!empty($result)) {
             $this->applicantLogin = $result['applicantLogin'];
@@ -58,91 +59,47 @@ class application {
 
     // SETTERS AND GETTERS
 
-    /**
-     * @return mixed
-     */
-    public function getApplicantLogin()
-    {
+    public function getApplicantLogin() {
         return $this->applicantLogin;
     }
 
-    /**
-     * @param mixed $applicantLogin
-     */
-    public function setApplicantLogin($applicantLogin): void
-    {
+    public function setApplicantLogin($applicantLogin): void {
         $this->applicantLogin = htmlspecialchars($applicantLogin);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id): void
-    {
+    public function setId($id): void {
         $this->id = htmlspecialchars($id);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFormId()
-    {
+    public function getFormId() {
         return $this->formId;
     }
 
-    /**
-     * @param mixed $formId
-     */
-    public function setFormId($formId): void
-    {
+    public function setFormId($formId): void {
         $this->formId = htmlspecialchars($formId);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getScore()
-    {
+    public function getScore() {
         return $this->score;
     }
 
-    /**
-     * @param mixed $score
-     */
-    public function setScore($score): void
-    {
+    public function setScore($score): void {
         $this->score = htmlspecialchars($score);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDate()
-    {
+    public function getDate() {
         return $this->date;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLastModified()
-    {
+    public function getLastModified() {
         return $this->lastModified;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStatusId()
-    {
+    public function getStatusId() {
         return $this->statusId;
     }
 }

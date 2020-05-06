@@ -1,5 +1,5 @@
 <?php
-require_once './objects/EasyTable.php';
+require_once 'EasyTable.php';
 
 class QuestionCategory extends EasyTable {
     protected int $TITLE_LEN = 10;

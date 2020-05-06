@@ -1,5 +1,5 @@
 <?php
-require_once 'database.php';
+require_once 'Database.php';
 
 error_reporting(E_ALL);
 ini_set('display_startup_errors', 1);

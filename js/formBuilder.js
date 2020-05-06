@@ -108,7 +108,7 @@ $('#addQuestionBtn').on('click', function () {
     let questionTypeSelect = lastQuestionCard.find('select[name="questionType"]')
 
     ajax(
-        "./questionCategories.php",
+        "./control/questionCategories.php",
         "GET",
         null,
         function(data) {
@@ -254,6 +254,8 @@ function parseQuestion(questionContent) {
 }
 
 $('#saveFormBtn').on('click', function () {
+    let loadingInfoHolder = showPreloader("Ожидайте, выполняется загрузка формы...")
+
     let form = new Form()
     let questionsList = []
 
@@ -265,16 +267,23 @@ $('#saveFormBtn').on('click', function () {
     form.specialtyId = $('#specialtySelect').val()
     form.typeId = $('#formTypeSelect').val()
 
-    console.log(form)
-
-    // ajax(
-    //     "./forms.php",
-    //     "POST",
-    //     JSON.stringify(form),
-    //     function (data) {
-    //         //TODO: ДЕЙСТВИЯ ПОСЛЕ УСПЕШНОЙ ЗАГРУЗКИ ФОРМЫ
-    //     }
-    // )
+    ajax(
+        "./control/forms.php",
+        "POST",
+        JSON.stringify(form),
+        function (data) {
+            showAlert(data.message, "success", 4000, loadingInfoHolder, true)
+            setTimeout(function() {
+                window.location.href = "./controlPanel.php"
+            }, 4000);
+        },
+        function (data) {
+            showAlert(data.message, "danger", 3000, loadingInfoHolder, true)
+            setTimeout(function() {
+                hidePreloader();
+            }, 3000);
+        }
+    )
 })
 
 class Form {

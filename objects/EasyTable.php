@@ -1,6 +1,6 @@
 <?php
-require_once 'core.php';
-require_once 'database.php';
+require_once '../core.php';
+require_once '../Database.php';
 
 class EasyTable {
     protected int $TITLE_LEN = 45;
@@ -13,11 +13,11 @@ class EasyTable {
 
     public function __construct($_id = null, $_title = null) {
         if(!empty($_id)) {
-            $this->id = $_id;
+            $this->id = htmlspecialchars(strip_tags($_id));
             $this->find();
         }
         if(!empty($_title)) {
-            $this->title = $_title;
+            $this->title = htmlspecialchars(strip_tags($_title));
         }
     }
 

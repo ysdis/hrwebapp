@@ -35,13 +35,19 @@ function hidePreloader() {
     });
 }
 
-function showPreloader(callback = function () {}) {
-    let preloader = $('#preloader');
-    preloader.show();
+function showPreloader(text = null, callback = function () {}) {
+    let preloader = $('#preloader')
+    let preloaderText = $('#preloaderText')
+    if(text !== null) {
+        preloaderText.empty()
+        preloaderText.append(text)
+    }
+    preloader.show()
     preloader.animate({'opacity': 1}, 200, function () {
-        $('body').addClass("preloader-site");
-        callback();
+        $('body').addClass("preloader-site")
+        callback()
     });
+    return preloaderText
 }
 
 (function() {
@@ -100,7 +106,7 @@ function ajax(url,
             callbackSuccess(data);
         },
         error: function(data) {
-            callbackError(data);
+            callbackError(data.responseJSON);
         }
     });
 }
@@ -197,7 +203,7 @@ class User {
     download() {
         let self = this;
         $.ajax({
-            url: './users.php',
+            url: './control/users.php',
             method: 'get',
             contentType: 'html',
             data: {

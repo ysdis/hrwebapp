@@ -28,12 +28,13 @@ function login() {
         "./login.php",
         "POST",
         JSON.stringify({'login': $('#userLogin').val(), 'password': $('#userPassword').val()}),
-        function () {
+        function (data) {
+            console.log(data.message)
             window.location.href = "./controlPanel.php";
         },
         function (data) {
             $('#userPassword').val('');
-            showAlert(data.responseJSON.message, 'danger', 0, $('#errHolder'), true);
+            showAlert(data.message, 'danger', 0, $('#errHolder'), true);
             hidePreloader();
         }
     );
@@ -57,7 +58,7 @@ function register() {
         function (data) {
             $('#regPassword').val('');
             $('#regPasswordRepeat').val('');
-            showAlert(data.responseJSON.message, 'danger', 0, $('#errHolderReg'), true);
+            showAlert(data.message, 'danger', 0, $('#errHolderReg'), true);
             hidePreloader();
         }
     );

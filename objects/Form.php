@@ -1,12 +1,12 @@
 <?php
-require_once '../core.php';
-require_once '../Database.php';
+require_once dirname(dirname(__FILE__)).'/core.php';
+require_once dirname(dirname(__FILE__)).'/Database.php';
 
 class Form {
-    protected int $TITLE_LEN = 144;
+    protected $TITLE_LEN = 144;
 
-    protected string $tableName = "forms";
-    protected array $errorMessages = array(
+    protected $tableName = "forms";
+    protected $errorMessages = array(
         "itemWasNotFound" => "Форма не найдена.",
         "unableCreateItem" => "Невозможно создать форму!",
         "unableUpdateItem" => "Невозможно обновить форму!",

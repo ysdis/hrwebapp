@@ -1,13 +1,13 @@
 <?php
-require_once '../core.php';
-require_once '../Database.php';
+require_once dirname(dirname(__FILE__)).'/core.php';
+require_once dirname(dirname(__FILE__)).'/Database.php';
 
 class Question {
-    protected int $TITLE_LEN = 1000;
-    protected int $IMAGE_LEN = 200;
+    protected $TITLE_LEN = 1000;
+    protected $IMAGE_LEN = 200;
 
-    protected string $tableName = "questions";
-    protected array $errorMessages = array(
+    protected $tableName = "questions";
+    protected $errorMessages = array(
         "itemWasNotFound" => "Вопрос не найден.",
         "unableCreateItem" => "Невозможно создать вопрос!",
         "unableUpdateItem" => "Невозможно обновить вопрос!",

@@ -7,7 +7,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 $data = json_decode(file_get_contents("php://input"));
 
-if(empty($data)) {
+if(empty($data->login) || empty($data->password)) {
     throwErr("Данные для входа не были переданы!", "LOGIN-2", 400);
 } else {
     $user = new User();

@@ -1,12 +1,12 @@
 <?php
-require_once '../core.php';
-require_once '../Database.php';
+require_once dirname(dirname(__FILE__)).'/core.php';
+require_once dirname(dirname(__FILE__)).'/Database.php';
 
 class Option {
-    protected int $CONTENT_LEN = 1000;
+    protected $CONTENT_LEN = 1000;
 
-    protected string $tableName = "options";
-    protected array $errorMessages = array(
+    protected $tableName = "options";
+    protected $errorMessages = array(
         "itemWasNotFound" => "Вариант ответа не найден.",
         "unableCreateItem" => "Невозможно создать вариант ответа!",
         "unableUpdateItem" => "Невозможно обновить вариант ответа!",

@@ -1,5 +1,5 @@
 <?php
-require_once '../core.php';
+require_once dirname(dirname(__FILE__)).'/core.php';
 
 // ERROR_PREFIX 20
 // MAX ERR CODE 2021

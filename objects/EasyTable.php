@@ -1,15 +1,15 @@
 <?php
-require_once '../core.php';
-require_once '../Database.php';
+require_once dirname(dirname(__FILE__)).'/core.php';
+require_once dirname(dirname(__FILE__)).'/Database.php';
 
 class EasyTable {
-    protected int $TITLE_LEN = 45;
+    const TITLE_LEN = 50;
 
-    protected ?string $tableName = null;
-    protected ?array $errorMessages = null;
+    protected $tableName = null;
+    protected $errorMessages = null;
 
-    public ?string $id = null;
-    public ?string $title = null;
+    public $id = null;
+    public $title = null;
 
     public function __construct($_id = null, $_title = null) {
         if(!empty($_id)) {
@@ -38,7 +38,7 @@ class EasyTable {
 
     public function create() {
         if(empty($this->title)) return false;
-        if(strlen($this->title) > $this->TITLE_LEN) return false;
+        if(strlen($this->title) > self::TITLE_LEN) return false;
 
         $query = "INSERT INTO {$this->tableName} (title) VALUES (:title);";
         try {
@@ -53,7 +53,7 @@ class EasyTable {
 
     public function update() {
         if(empty($this->title)) return false;
-        if(strlen($this->title) > $this->TITLE_LEN) return false;
+        if(strlen($this->title) > self::TITLE_LEN) return false;
 
         $query = "UPDATE {$this->tableName} SET title = :title WHERE id = :id;";
         try {

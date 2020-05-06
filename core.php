@@ -61,7 +61,7 @@ function validateSessionFRONT() { // Session & Cookies validation
             }
             return array("login" => $_COOKIE["u_l"], "roleId" => getRole($_COOKIE["u_l"]));
         } else {
-            if($_SERVER['PHP_SELF'] !== "/hrwebapp/index.php" && $_SERVER['PHP_SELF'] !== "index.php") {
+            if($_SERVER['PHP_SELF'] !== "/hrwebapp/index.php" && $_SERVER['PHP_SELF'] !== "index.php" && $_SERVER['PHP_SELF'] !== "/index.php") {
                 header("location: index.php");
                 exit;
             }

@@ -6,6 +6,10 @@
 
     $login = (empty($validated['login'])) ? null : $validated['login'];
     $CUR_USER_ROLE = (empty($validated['roleId'])) ? null : $validated['roleId'];
+
+    if($CUR_USER_ROLE !== ADMIN) {
+        header('Location: ./controlPanel.php');
+    }
 ?>
 
 <!DOCTYPE html>

@@ -1,7 +1,7 @@
 <?php
 require_once 'core.php';
 require_once 'database.php';
-require_once './objects/user.php';
+require_once './objects/application.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -55,6 +55,7 @@ if(empty($data) && $_SERVER["REQUEST_METHOD"] !== "GET") {
             $user->setMiddleName($data->middleName);
 
             if($user->create()) {
+                session_start();
                 $_SESSION["loggedin"] = true;
                 $_SESSION["login"] = $data->login;
                 setcookie("u_l", $data->login, time() + COOKIE_LIFE_TIME);
@@ -66,4 +67,3 @@ if(empty($data) && $_SERVER["REQUEST_METHOD"] !== "GET") {
             }
     }
 }
-

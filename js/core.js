@@ -4,6 +4,8 @@ const lettersWithRussianR = /^[a-zA-Z0-9ЁёА-я ]*$/gm;
 const textareaLettersR = /[^A-Za-z0-9ЁёА-я .'?!,@$#-_\n\r]*$/gm;
 const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+$("html, body").animate({ scrollTop: 0 }, "slow");
+
 //-------------TABLE GENERATOR------------//
 
 function createTable(headers = [],data, container = null, placeholder = '-') {
@@ -33,7 +35,7 @@ function hidePreloader() {
     });
 }
 
-function showPreloader(callback = null) {
+function showPreloader(callback = function () {}) {
     let preloader = $('#preloader');
     preloader.show();
     preloader.animate({'opacity': 1}, 200, function () {

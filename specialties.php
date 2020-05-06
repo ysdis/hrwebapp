@@ -5,33 +5,10 @@ require_once './objects/user.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 
-$contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-if(strcasecmp($contentType, 'application/json') != 0 && $_SERVER["REQUEST_METHOD"] !== "GET") {
-    throwErr('Тип контента должен быть application/json', "SPEC-0", 400);
-}
+$validated = validateSessionAPI();
 
-$login = "";
-$CUR_USER_ROLE = 0;
-
-// Session & Cookies validation
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    if(isset($_COOKIE["u_l"]) && isset($_COOKIE["u_key"])) {
-        if(md5($_COOKIE["u_l"].SECRET_PHRASE) !== $_COOKIE["u_key"]) {
-            session_destroy();
-            unset($_COOKIE["u_l"]);
-            unset($_COOKIE["u_key"]);
-            throwErr("Обнаружена ошибка, попробуйте зайти в систему заново..", "SPEC-COOKIE-VIOLATION", 403);
-        } else {
-            $login = $_COOKIE["u_l"];
-        }
-    }
-} else {
-    $login = $_SESSION["login"];
-}
-
-if(!empty($login)) {
-    $CUR_USER_ROLE = getRole($login);
-}
+$login = $validated['login'];
+$CUR_USER_ROLE = $validated['roleId'];
 
 $data = json_decode(file_get_contents("php://input"));
 

@@ -16,7 +16,7 @@ CREATE SCHEMA IF NOT EXISTS `hrwebapp` DEFAULT CHARACTER SET utf8 ;
 USE `hrwebapp` ;
 
 -- -----------------------------------------------------
--- Table `hrwebapp`.`specialty`
+-- Table `hrwebapp`.`specialties`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `hrwebapp`.`specialties` ;
 
@@ -150,8 +150,8 @@ DROP TABLE IF EXISTS `hrwebapp`.`questions` ;
 CREATE TABLE IF NOT EXISTS `hrwebapp`.`questions` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `formId` INT NOT NULL,
-  `title` VARCHAR(144) NOT NULL,
-  `image` VARCHAR(144) NULL COMMENT 'Path to an image on the server',
+  `title` VARCHAR(1000) NOT NULL,
+  `image` VARCHAR(200) NULL COMMENT 'Path to an image on the server',
   `questionType` INT NOT NULL,
   `answerType` INT NOT NULL,
   `questionCategory` INT NOT NULL,
@@ -229,10 +229,10 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `hrwebapp`.`options` ;
 
 CREATE TABLE IF NOT EXISTS `hrwebapp`.`options` (
-  `id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `questionId` INT NOT NULL,
-  `content` VARCHAR(100) NOT NULL,
-  `isCorrect` TINYINT NOT NULL,
+  `content` VARCHAR(1000) NOT NULL,
+  `isCorrect` TINYINT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `questionKey`
     FOREIGN KEY (`questionId`)
@@ -321,19 +321,25 @@ CREATE DEFINER = CURRENT_USER TRIGGER `hrwebapp`.`options_BEFORE_INSERT` BEFORE 
 BEGIN
 	DECLARE correctOptions INT;
     DECLARE currentQuestionType INT;
+    DECLARE currentAnswerType INT;
     DECLARE numberOfOptions INT;
     
     SELECT COUNT(*) INTO correctOptions FROM options WHERE questionId = NEW.questionId and isCorrect = 1;
-    SELECT questionType INTO currentQuestionType FROM questions WHERE id = NEW.questionId;
+    SELECT questionType INTO currentQuestionType FROM questions WHERE id = NEW.questionId; -- Оцениваемый или нет
     SELECT COUNT(*) INTO numberOfOptions  FROM options WHERE questionId = NEW.questionId;
+    SELECT answerType INTO currentAnswerType FROM questions WHERE id = NEW.questionId; -- Одинарный, множественный, письменный
     
-    IF currentQuestionType = 1 THEN -- Тип вопроса "Одинарный ответ"
+    IF currentQuestionType = 1 and NEW.isCorrect IS NULL and currentAnswerType < 3 THEN -- Если тип ответа "Оцениваемый" и правильность не задана
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Оцениваемые вопросы должны содержать варианты ответы дифференцированные на неправильные и верные!';
+    END IF;
+    
+    IF currentAnswerType = 1 THEN -- Тип вопроса "Одинарный ответ"
 		IF correctOptions > 0 THEN -- Когда правильных ответов больше нуля
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'В вопросе с одинарным ответом не может быть более одно правильного варианта ответа!';
         END IF;
     END IF;
     
-	IF currentQuestionType = 3 THEN -- Тип вопроса "Письменный ответ"
+	IF currentAnswerType = 3 THEN -- Тип вопроса "Письменный ответ"
 		IF numberOfOptions > 0 THEN -- Когда вариантов ответа больше нуля
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'В вопросе с письменным ответом не может быть более одно варианта ответа!';
         ELSE
@@ -369,7 +375,7 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
--- Data for table `hrwebapp`.`specialty`
+-- Data for table `hrwebapp`.`specialties`
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `hrwebapp`;
@@ -399,10 +405,10 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `hrwebapp`;
-INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('olgol', '123456', 'Свиридов', 'Михаил', 'Павлович', 4, 1, DEFAULT);
-INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('mulgul', '12345678', 'Кочанова', 'Ольга', 'Викторовна', 1, 1, DEFAULT);
-INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('test@test.com', 'qwerty', 'Идиотов', ' Кирилл', ' Николаевич', 5, 1, DEFAULT);
-INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('admin@admin.com', 'admin', 'Администратор', '-', '-', NULL, 3, DEFAULT);
+INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('olgol', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Свиридов', 'Михаил', 'Павлович', 4, 1, DEFAULT);
+INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('mulgul', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Кочанова', 'Ольга', 'Викторовна', 1, 1, DEFAULT);
+INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('test@test.com', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Идиотов', ' Кирилл', ' Николаевич', 5, 1, DEFAULT);
+INSERT INTO `hrwebapp`.`users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('admin@admin.com', '$2y$2y$10$G2BG/Cmw17qjoTafssT28u1f3Qe.RI4MCgd1xoy.kcIcnh4qQVB9.', 'Администратор', '-', '-', NULL, 3, DEFAULT);
 
 COMMIT;
 
@@ -424,7 +430,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `hrwebapp`;
-INSERT INTO `hrwebapp`.`forms` (`id`, `title`, `specialtyId`, `typeId`, `isActive`) VALUES (1, 'Вакансия на должность младшего программиста в отделе разработки решений', 4, 1, DEFAULT);
+INSERT INTO `hrwebapp`.`forms` (`id`, `title`, `specialtyId`, `typeId`, `isActive`) VALUES (1, 'Вакансия на должность младшего Java программиста в отделе разработки решений', 4, 1, DEFAULT);
 
 COMMIT;
 
@@ -474,6 +480,9 @@ INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionT
 INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (3, 1, 'Почему вы хотите получить именну эту должность в нашей компании?', NULL, 2, 3, 1);
 INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (4, 1, 'Готовы ли вы переехать?', NULL, 2, 3, 1);
 INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (5, 1, 'Какие зарплаты вы получали раньше?', NULL, 2, 3, 2);
+INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (6, 1, 'MVC - это', NULL, 1, 2, 3);
+INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (7, 1, 'Какой  из перечисленных принципов не относится к ООП?', NULL, 1, 1, 3);
+INSERT INTO `hrwebapp`.`questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (8, 1, 'Как называется функция, являющаяся точкой входа в программу. В приложении может быть несколько таких методов. Если метод отсутствует, то компиляция возможна, но при запуске будет получена ошибка. Ответ напишите без скобок.', NULL, 1, 3, 3);
 
 COMMIT;
 
@@ -496,6 +505,22 @@ COMMIT;
 START TRANSACTION;
 USE `hrwebapp`;
 INSERT INTO `hrwebapp`.`applications` (`id`, `applicantLogin`, `formId`, `score`, `date`, `statusId`, `lastModified`) VALUES (1, 'admin@admin.com', 1, NULL, DEFAULT, DEFAULT, DEFAULT);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `hrwebapp`.`options`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `hrwebapp`;
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (1, 6, '- это схема разделения данных приложения, пользовательского интерфейса и управляющей логики на три отдельных компонента', 1);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (2, 6, '- это шаблон проектирования пользовательского интерфейса, который был разработан для облегчения автоматического модульного тестирования и улучшения разделения ответственности', 0);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (3, 6, '- это шаблон для разделения модели и её представления, что необходимо для их изменения отдельно друг от друга', 0);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (4, 7, 'Полиморвизм', 0);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (5, 7, 'Абстракция', 0);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (6, 7, 'Анонимность', 1);
+INSERT INTO `hrwebapp`.`options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (7, 8, 'main', NULL);
 
 COMMIT;
 

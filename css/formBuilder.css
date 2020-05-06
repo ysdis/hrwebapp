@@ -1,0 +1,35 @@
+#questionLinksHolder .col-12 {
+    cursor: pointer;
+    -webkit-transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#questionLinksHolder .col-12:hover {
+    background-color: #e9ecef;
+}
+
+#questionLinksHolder .col-12:active {
+    background-color: #d0d4d9;
+}
+
+#questionsCardsHolder .questionCard {
+    border-radius: 20px;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.foggy {
+    cursor: pointer;
+    -webkit-transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.foggy:hover {
+    background-color: #e9ecef;
+}
+
+.foggy:active {
+    background-color: #d0d4d9;
+}

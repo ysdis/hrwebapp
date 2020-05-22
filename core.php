@@ -17,18 +17,26 @@ function throwSuccess($message, $responseCode) {
     die();
 }
 
-function validateSessionAPI() { // Session & Cookies validation
+function createCookieKey($login) {
+    return md5($login.SECRET_PHRASE.$_SERVER['REMOTE_ADDR']);
+}
+
+function validateCookieKey($login, $cookieKey) {
+    return (createCookieKey($login) === $cookieKey);
+}
+
+function validateSessionAPI($emailSend = false) { // Session & Cookies validation
 
     $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
     if(strcasecmp($contentType, 'application/json') != 0 && $_SERVER["REQUEST_METHOD"] !== "GET") {
-        throwErr('Тип контента должен быть application/json', "USERS-0", 400);
+        throwErr('Тип контента должен быть application/json', "VALID-0", 400);
     }
 
     $login = "";
     session_start();
     if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         if(isset($_COOKIE["u_l"]) && isset($_COOKIE["u_key"])) {
-            if(md5($_COOKIE["u_l"].SECRET_PHRASE) !== $_COOKIE["u_key"]) {
+            if(validateCookieKey($_COOKIE["u_l"], $_COOKIE["u_key"])) {
                 session_destroy();
                 unset($_COOKIE["u_l"]);
                 unset($_COOKIE["u_key"]);
@@ -42,24 +50,34 @@ function validateSessionAPI() { // Session & Cookies validation
     }
 
     if(!empty($login)) {
-        return array("roleId" => getRole($login), "login" => $login);
+        if(isUserVerified($login) || $emailSend) {
+            return array("login" => $login, "roleId" => getRole($login));
+        } else {
+            throwErr("Аккаунт не активирован!", "EMAIL-DOESNT-VERIFIED", 403);
+        }
     }
 
     return null;
 }
 
-function validateSessionFRONT() { // Session & Cookies validation
+function validateSessionFRONT($emailSend = false) { // Session & Cookies validation
     session_start();
     if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         if(isset($_COOKIE["u_l"]) && isset($_COOKIE["u_key"])) {
-            if(md5($_COOKIE["u_l"].SECRET_PHRASE) !== $_COOKIE["u_key"]) {
+            if(validateCookieKey($_COOKIE["u_l"], $_COOKIE["u_key"])) {
                 session_destroy();
                 unset($_COOKIE["u_l"]);
                 unset($_COOKIE["u_key"]);
                 header("Location: logout.php");
                 exit;
+            } else {
+                if(isUserVerified($_COOKIE["u_l"]) || $emailSend) {
+                    return array("login" => $_COOKIE["u_l"], "roleId" => getRole($_COOKIE["u_l"]));
+                } else {
+                    header("Location: emailUnverified.php");
+                    exit;
+                }
             }
-            return array("login" => $_COOKIE["u_l"], "roleId" => getRole($_COOKIE["u_l"]));
         } else {
             if($_SERVER['PHP_SELF'] !== "/hrwebapp/index.php" && $_SERVER['PHP_SELF'] !== "index.php" && $_SERVER['PHP_SELF'] !== "/index.php") {
                 header("location: index.php");
@@ -73,8 +91,14 @@ function validateSessionFRONT() { // Session & Cookies validation
             header("Location: logout.php");
             exit;
         }
-        return array("login" => $_SESSION["login"], "roleId" => getRole($_SESSION["login"]));
+        if(isUserVerified($_SESSION["login"]) || $emailSend) {
+            return array("login" => $_SESSION["login"], "roleId" => getRole($_SESSION["login"]));
+        } else {
+            header("Location: emailUnverified.php");
+            exit;
+        }
     }
+    return null;
 }
 
 define("APPLICANT", '1');

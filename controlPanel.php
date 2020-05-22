@@ -33,10 +33,25 @@
                         <li class="nav-item">
                             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Главная</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Вакансии</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Сотрудники</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Заявки</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Тесты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="false">Настройки</a>
+                        </li>
                         <!-- РАЗНЫЕ ВКЛАДКИ ДЛЯ РАЗНЫХ РОЛЕЙ -->
                         <!-- СОИСКАТЕЛЬ: ГЛАВНАЯ (Список поданных заявок и их статус), ВАКАНСИИ, НАСТРОЙКИ -->
                         <!-- СОТРУДНИК: ГЛАВНАЯ (Список пройденных тестирований и их статус), ТЕСТЫ, НАСТРОЙКИ -->
-                        <!-- СОТРУДНИК: ГЛАВНАЯ (Список поданных заявок от соискателей, отсортированный по релевантности со шкалой), ТЕСТЫ (Создание, управление), ВАКАНСИИ (Создание, управление), НАСТРОЙКИ -->
+                        <!-- АДМИНИСТРАТОР: ГЛАВНАЯ (Список поданных заявок от соискателей, отсортированный по релевантности со шкалой), ТЕСТЫ (Создание, управление), ВАКАНСИИ (Создание, управление), НАСТРОЙКИ -->
                         <li class="nav-item">
                             <a href="./index.php" class="nav-link" aria-selected="false">На сайт компании</a>
                         </li>

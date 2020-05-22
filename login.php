@@ -1,6 +1,5 @@
 <?php
 require_once 'core.php';
-require_once 'Database.php';
 require_once './objects/User.php';
 
 header("Content-Type: application/json; charset=UTF-8");
@@ -19,7 +18,7 @@ if(empty($data->login) || empty($data->password)) {
         $_SESSION["loggedin"] = true;
         $_SESSION["login"] = $data->login;
         setcookie("u_l", $data->login, time() + COOKIE_LIFE_TIME);
-        setcookie("u_key", md5($data->login.SECRET_PHRASE), time() + COOKIE_LIFE_TIME);
+        setcookie("u_key", createCookieKey($data->login), time() + COOKIE_LIFE_TIME);
 
         throwSuccess("Вход успешно совершён!", 200);
     } else {

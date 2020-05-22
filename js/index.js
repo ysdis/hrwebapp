@@ -14,7 +14,7 @@ let user = new User(
         });
     },
     function (data) {
-        if(user.getLogin !== undefined) {
+        if(user.getLogin !== undefined && data.responseJSON.errorCode !== "EMAIL-DOESNT-VERIFIED") {
             showAlert("Что-то пошло не так! Cайт не может продолжить работу, попробуйте обновить страницу");
             console.log(data);
         }
@@ -53,7 +53,20 @@ function register() {
             'middleName': $('#regMiddle').val()
         }),
         function () {
-            window.location.href = "./controlPanel.php";
+            ajax(
+                "./sendVerificationEmail.php",
+                "GET",
+                null,
+                function () {
+                    window.location.href = "./controlPanel.php";
+                },
+                function (data) {
+                    $('#regPassword').val('');
+                    $('#regPasswordRepeat').val('');
+                    showAlert(data.message, 'danger', 0, $('#errHolderReg'), true);
+                    hidePreloader();
+                }
+            )
         },
         function (data) {
             $('#regPassword').val('');

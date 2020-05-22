@@ -1,12 +1,11 @@
 <?php
 define('__ROOT__', dirname(dirname(__FILE__)));
-require_once __ROOT__.'/core.php';
-require_once __ROOT__.'/Database.php';
+require __ROOT__.'/core.php';
 require_once __ROOT__.'/objects/User.php';
 
 header("Content-Type: application/json; charset=UTF-8");
 
-$validated = validateSessionAPI();
+$validated = validateSessionAPI(true);
 
 $login = (empty($validated['login'])) ? null : $validated['login'];
 $CUR_USER_ROLE = (empty($validated['roleId'])) ? null : $validated['roleId'];
@@ -60,11 +59,9 @@ if(empty($data) && $_SERVER["REQUEST_METHOD"] !== "GET") {
                 $_SESSION["login"] = $data->login;
                 setcookie("u_l", $data->login, time() + COOKIE_LIFE_TIME);
                 setcookie("u_key", md5($data->login.SECRET_PHRASE), time() + COOKIE_LIFE_TIME);
-
                 throwSuccess("Пользователь успешно зарегистрирован!", 201);
             } else {
                 throwErr("Регистрация провалилась!", "REGISTER-1", 403);
             }
     }
 }
-

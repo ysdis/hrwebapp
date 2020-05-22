@@ -20,10 +20,11 @@ class User {
     private $roleId;
     private $specialtyId;
     private $isActive;
+    private $emailVerified;
 
     function __construct($login = null) {
         if(!empty($login)) {
-            $this->login = $login;
+            $this->setLogin($login);
             $this->findByLogin();
         }
     }
@@ -162,7 +163,6 @@ class User {
         }
     }
 
-    // NOT TESTED
     public function findByLogin($login = null) {
         if(empty($login)) {
             if(empty($this->login)) {
@@ -182,10 +182,18 @@ class User {
             $this->roleId = $result['roleId'];
             $this->isActive = $result['isActive'];
             $this->specialtyId = $result['specialtyId'];
+            $this->emailVerified = $result['emailVerified'];
             return true;
         } else {
             throwErr("Пользователь не найден.", "USER_NOT_FOUND", 400);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function verify(): bool {
+        return (execQuery("UPDATE users SET emailVerified = 1 WHERE login = :LOGIN", array(":LOGIN" => $this->login)) === 1);
     }
 
     //--------------------------------------SETTERS--------------------------------------//
@@ -251,5 +259,9 @@ class User {
 
     public function getSpecialtyId() {
         return $this->specialtyId;
+    }
+
+    public function getEmailVerified() {
+        return $this->emailVerified;
     }
 }

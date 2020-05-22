@@ -28,12 +28,29 @@
         }
     }
 
-    function getRole($_login) {
+    function getRole($_login): int {
         try {
             if($stmt = (new Database)->conn->prepare("SELECT roleId FROM users WHERE login = :login;")) {
                 if($stmt->execute(array(":login" => $_login))) {
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                        return (empty($result['roleId'])) ? null : $result['roleId'];
+                        return (empty($result['roleId'])) ? -2 : $result['roleId'];
+                } else {
+                    return -1; // Something happened wrong
+                }
+            } else {
+                return -2; // !Error!
+            }
+        } catch(Exception $exception) {
+            die("Error: " . $exception->getMessage());
+        }
+    }
+
+    function isUserVerified($_login): bool {
+        try {
+            if($stmt = (new Database)->conn->prepare("SELECT emailVerified FROM users WHERE login = :login;")) {
+                if($stmt->execute(array(":login" => $_login))) {
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    return (empty($result['emailVerified'])) ? false : $result['emailVerified'] === "1";
                 } else {
                     return -1; // Something happened wrong
                 }

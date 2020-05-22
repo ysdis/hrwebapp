@@ -184,20 +184,21 @@ let currentUserLogin;
 
 class User {
     constructor(login, callbackSuccess, callbackFail) {
-        this._callbackSuccess = callbackSuccess;
-        this._callbackFail = callbackFail;
-        if(login === undefined) return;
+        this._callbackSuccess = callbackSuccess
+        this._callbackFail = callbackFail
+        if(login === undefined) return
 
-        this._login = login;
-        this._roleId = 0;
-        this._firstName = "";
-        this._lastName = "";
-        this._middleName = "-";
-        this._isActive = true;
-        this._specialtyId = 0;
-        this._password = "";
+        this._login = login
+        this._roleId = 0
+        this._firstName = ""
+        this._lastName = ""
+        this._middleName = "-"
+        this._isActive = true
+        this._specialtyId = 0
+        this._password = ""
+        this.verified = 0
 
-        this.download();
+        this.download()
     }
 
     download() {
@@ -210,17 +211,18 @@ class User {
                 login: this._login
             },
             success: function(data) {
-                self._lastName = data.lastName;
-                self._firstName = data.firstName;
-                self._middleName = data.middleName;
-                self._roleId = parseInt(data.roleId);
-                self._isActive = (parseInt(data.isActive) === 1);
-                self._specialtyId = parseInt(data.specialtyId);
+                self._lastName = data.lastName
+                self._firstName = data.firstName
+                self._middleName = data.middleName
+                self._roleId = parseInt(data.roleId)
+                self._isActive = (parseInt(data.isActive) === 1)
+                self._specialtyId = parseInt(data.specialtyId)
+                self.verified = parseInt(data.emailVerified)
 
-                self._callbackSuccess();
+                self._callbackSuccess()
             },
             error: function(data) {
-                self._callbackFail(data);
+                self._callbackFail(data)
             }
         });
     }

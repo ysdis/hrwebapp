@@ -5,16 +5,6 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema a332840_1
--- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema a332840_1
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `a332840_1` DEFAULT CHARACTER SET utf8 ;
-USE `a332840_1` ;
-
--- -----------------------------------------------------
 -- Table `specialties`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `specialties` (
@@ -48,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `specialtyId` INT NULL,
   `roleId` INT NOT NULL DEFAULT 1,
   `isActive` TINYINT NOT NULL DEFAULT 1,
+  `emailVerified` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`login`),
   CONSTRAINT `specKey`
     FOREIGN KEY (`specialtyId`)
@@ -244,10 +235,30 @@ CREATE TABLE IF NOT EXISTS `userAnswers` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
-USE `a332840_1`;
+-- -----------------------------------------------------
+-- Placeholder table for view `appsDetailed`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `appsDetailed` (`'ID'` INT, `'ФИО соискателя'` INT, `'Наименование должности'` INT, `'Балл'` INT, `'Дата заказа'` INT, `'Статус заявки'` INT);
+
+-- -----------------------------------------------------
+-- View `appsDetailed`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `appsDetailed`;
+
+CREATE  OR REPLACE VIEW `appsDetailed` AS SELECT
+	applications.id AS 'ID',
+    CONCAT(users.lastName, ' ', LEFT(users.firstName, 1), ' ', LEFT(users.middleName, 1)) AS 'ФИО соискателя',
+    forms.title AS 'Наименование должности',
+    applications.score AS 'Балл',
+    date_format(applications.date, '%d %M %Y') AS 'Дата заказа',
+    applicationStatuses.title AS 'Статус заявки'
+FROM applications
+JOIN users ON applications.applicantLogin = users.login
+JOIN forms ON applications.formId = forms.id
+JOIN applicationStatuses ON applications.statusId = applicationStatuses.id
+ORDER BY 5, 4;
 
 DELIMITER $$
-USE `a332840_1`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `forms_BEFORE_INSERT` BEFORE INSERT ON `forms` FOR EACH ROW
 BEGIN
 	DECLARE specialtyStatus TINYINT;
@@ -258,7 +269,7 @@ BEGIN
     END IF;
 END$$
 
-USE `a332840_1`$$
+
 CREATE DEFINER = CURRENT_USER TRIGGER `applications_BEFORE_INSERT` BEFORE INSERT ON `applications` FOR EACH ROW
 BEGIN
 	DECLARE isFormActive TINYINT;
@@ -269,7 +280,6 @@ BEGIN
     END IF;
 END$$
 
-USE `a332840_1`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `applications_BEFORE_UPDATE` BEFORE UPDATE ON `applications` FOR EACH ROW
 BEGIN
 	IF NEW.statusId != OLD.statusId and OLD.statusId > 1 THEN -- Когда статус изменился и статут не "Обрабатывается"
@@ -277,8 +287,7 @@ BEGIN
     END IF;
 END$$
 
-USE `a332840_1`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `a332840_1`.`options_BEFORE_INSERT` BEFORE INSERT ON `options` FOR EACH ROW
+CREATE DEFINER = CURRENT_USER TRIGGER `options_BEFORE_INSERT` BEFORE INSERT ON `options` FOR EACH ROW
 BEGIN
 	DECLARE correctOptions INT;
     DECLARE currentQuestionType INT;
@@ -309,8 +318,8 @@ BEGIN
     END IF;
 END$$
 
-USE `a332840_1`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `a332840_1`.`userAnswers_BEFORE_INSERT` BEFORE INSERT ON `userAnswers` FOR EACH ROW
+
+CREATE DEFINER = CURRENT_USER TRIGGER `userAnswers_BEFORE_INSERT` BEFORE INSERT ON `userAnswers` FOR EACH ROW
 BEGIN
 	DECLARE currentAnswerType INT;
     
@@ -336,7 +345,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- Data for table `specialties`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `specialties` (`id`, `name`, `description`, `isOpen`) VALUES (1, 'Аналитик (Управляющий проектами)', '-', DEFAULT);
 INSERT INTO `specialties` (`id`, `name`, `description`, `isOpen`) VALUES (2, 'Тестировщик', '-', DEFAULT);
 INSERT INTO `specialties` (`id`, `name`, `description`, `isOpen`) VALUES (3, 'Офис-менеджер', '-', DEFAULT);
@@ -350,7 +359,7 @@ COMMIT;
 -- Data for table `userRoles`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `userRoles` (`id`, `title`) VALUES (1, 'Соискатель');
 INSERT INTO `userRoles` (`id`, `title`) VALUES (2, 'Сотрудник');
 INSERT INTO `userRoles` (`id`, `title`) VALUES (3, 'Администратор');
@@ -362,11 +371,11 @@ COMMIT;
 -- Data for table `users`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
-INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('olgol', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Свиридов', 'Михаил', 'Павлович', 4, 1, DEFAULT);
-INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('mulgul', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Кочанова', 'Ольга', 'Викторовна', 1, 1, DEFAULT);
-INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('test@test.com', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Идиотов', ' Кирилл', ' Николаевич', 5, 1, DEFAULT);
-INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`) VALUES ('admin@admin.com', '$2y$2y$10$G2BG/Cmw17qjoTafssT28u1f3Qe.RI4MCgd1xoy.kcIcnh4qQVB9.', 'Администратор', '-', '-', NULL, 3, DEFAULT);
+
+INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`, `emailVerified`) VALUES ('olgol', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Свиридов', 'Михаил', 'Павлович', 4, 1, DEFAULT, DEFAULT);
+INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`, `emailVerified`) VALUES ('mulgul', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Кочанова', 'Ольга', 'Викторовна', 1, 1, DEFAULT, DEFAULT);
+INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`, `emailVerified`) VALUES ('test@test.com', '$2y$10$KAxR8ZrK/BC3IOhWIW1m9OcMMOmTXJb6V2hJkzEt/ubsSVdOJubki', 'Идиотов', ' Кирилл', ' Николаевич', 5, 1, DEFAULT, DEFAULT);
+INSERT INTO `users` (`login`, `password`, `lastName`, `firstName`, `middleName`, `specialtyId`, `roleId`, `isActive`, `emailVerified`) VALUES ('admin@admin.com', '$2y$2y$10$G2BG/Cmw17qjoTafssT28u1f3Qe.RI4MCgd1xoy.kcIcnh4qQVB9.', 'Администратор', '-', '-', NULL, 3, DEFAULT, DEFAULT);
 
 COMMIT;
 
@@ -375,7 +384,7 @@ COMMIT;
 -- Data for table `formTypes`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `formTypes` (`id`, `title`) VALUES (1, 'Резюмирование');
 INSERT INTO `formTypes` (`id`, `title`) VALUES (2, 'Тестирование');
 INSERT INTO `formTypes` (`id`, `title`) VALUES (3, 'Комбинированный');
@@ -387,7 +396,7 @@ COMMIT;
 -- Data for table `forms`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `forms` (`id`, `title`, `specialtyId`, `typeId`, `isActive`) VALUES (1, 'Вакансия на должность младшего Java программиста в отделе разработки решений', 4, 1, DEFAULT);
 
 COMMIT;
@@ -397,7 +406,7 @@ COMMIT;
 -- Data for table `questionTypes`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `questionTypes` (`id`, `title`) VALUES (1, 'Оцениваемый');
 INSERT INTO `questionTypes` (`id`, `title`) VALUES (2, 'Неоцениваемый');
 
@@ -408,7 +417,7 @@ COMMIT;
 -- Data for table `questionCategories`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `questionCategories` (`id`, `title`) VALUES (1, 'Общие вопросы');
 INSERT INTO `questionCategories` (`id`, `title`) VALUES (2, 'Опыт работы');
 INSERT INTO `questionCategories` (`id`, `title`) VALUES (3, 'Знания');
@@ -420,7 +429,7 @@ COMMIT;
 -- Data for table `answerTypes`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `answerTypes` (`id`, `title`) VALUES (1, 'Одинарный ответ');
 INSERT INTO `answerTypes` (`id`, `title`) VALUES (2, 'Множественный ответ');
 INSERT INTO `answerTypes` (`id`, `title`) VALUES (3, 'Письменный ответ');
@@ -432,7 +441,7 @@ COMMIT;
 -- Data for table `questions`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (1, 1, 'Каковы ваши сильные стороны?', NULL, 2, 3, 1);
 INSERT INTO `questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (2, 1, 'Каковы ваши слабые стороны?', NULL, 2, 3, 1);
 INSERT INTO `questions` (`id`, `formId`, `title`, `image`, `questionType`, `answerType`, `questionCategory`) VALUES (3, 1, 'Почему вы хотите получить именну эту должность в нашей компании?', NULL, 2, 3, 1);
@@ -449,7 +458,7 @@ COMMIT;
 -- Data for table `applicationStatuses`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `applicationStatuses` (`id`, `title`) VALUES (1, 'Обрабатывается');
 INSERT INTO `applicationStatuses` (`id`, `title`) VALUES (2, 'Подтверждена');
 INSERT INTO `applicationStatuses` (`id`, `title`) VALUES (3, 'Отклонена');
@@ -461,7 +470,7 @@ COMMIT;
 -- Data for table `applications`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `applications` (`id`, `applicantLogin`, `formId`, `score`, `date`, `statusId`, `lastModified`) VALUES (1, 'admin@admin.com', 1, NULL, DEFAULT, DEFAULT, DEFAULT);
 
 COMMIT;
@@ -471,7 +480,7 @@ COMMIT;
 -- Data for table `options`
 -- -----------------------------------------------------
 START TRANSACTION;
-USE `a332840_1`;
+
 INSERT INTO `options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (1, 6, '- это схема разделения данных приложения, пользовательского интерфейса и управляющей логики на три отдельных компонента', 1);
 INSERT INTO `options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (2, 6, '- это шаблон проектирования пользовательского интерфейса, который был разработан для облегчения автоматического модульного тестирования и улучшения разделения ответственности', 0);
 INSERT INTO `options` (`id`, `questionId`, `content`, `isCorrect`) VALUES (3, 6, '- это шаблон для разделения модели и её представления, что необходимо для их изменения отдельно друг от друга', 0);
